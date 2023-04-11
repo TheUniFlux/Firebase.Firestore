@@ -1,0 +1,17 @@
+{
+    "name": "Kingdox.UniFlux.Firebase.Firestore",
+    "rootNamespace": "",
+    "references": [
+        "GUID:fba6bbe761e454088b10837d45df2792",
+        "GUID:deccb46461c684b399bd2ef983966192"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
