@@ -1,0 +1,12 @@
+{
+    "name": "com.kingdox.uniflux.firebase.firestore",
+    "displayName": "UniFlux.Firebase.Firestore",
+    "author": { "name": "Xavier Thomas Peter Arpa López ('Kingdox')", "url": "https://github.com/kingdox" },
+    "version": "1.0.0",
+    "unity": "2020.1",
+    "description": "Firebase with UniFlux.",
+    "keywords": [ "Flux", "Unity", "UniFlux" ],
+    "license": "MIT",
+    "category": "Flux",
+    "dependencies": {}
+}
