@@ -41,21 +41,6 @@ namespace Kingdox.UniFlux.Firebase.Firestore
         public const string GetId = K + nameof(GetId);
         public const string Subscribe = K + nameof(Subscribe);
     }
-    // public static class Service
-    // {
-    //     public static void Initialize() => Middleware.Invoke_Publish(Key.Initialize);
-
-    //     public static Task Set(in (string path, object value) data) => Middleware<(string path, object value)>.Invoke_Task(Key.Set, data);
-    //     public static Task Set(in (string path, IDictionary<string, object> value) data) => Middleware<(string path, IDictionary<string, object> value)>.Invoke_Task(Key.Set, data);
-    //     public static Task<object> Get(in string path) => Middleware<string, object>.Invoke_Task(Key.Get, path);
-    //     public static Task<object> Get(in (string path, object defaultValue) data) => Middleware<(string path, object defaultValue), object>.Invoke_Task(Key.Get, data);
-    //     public static Task<object> Get(in (string path, Type typeValue) data) => Middleware<(string path, Type typeValue), object>.Invoke_Task(Key.Get, data);
-    //     public static Task<DocumentSnapshot> GetSnapshot(in string path) => Middleware<string, DocumentSnapshot>.Invoke_Task(Key.Get, path);
-    //     public static Task<List<(string id, Dictionary<string, object> document)>> GetAll(in string path) => Middleware<string, List<(string id, Dictionary<string, object> document)>>.Invoke_Task(Key.GetAll, path);
-
-    //     public static string GetId(string pathCollection) => Middleware<string, string>.Invoke_Publish(Key.GetId, pathCollection);
-    //     public static void Subscribe((bool condition, string path, Action<DocumentSnapshot> callback) data) => Middleware<(bool condition, string path, Action<DocumentSnapshot> callback)>.Invoke_Publish(Key.Subscribe, data);
-    // }
     public sealed partial class FirestoreFlux : MonoFlux
     {
         private FirebaseFirestore db = default;
