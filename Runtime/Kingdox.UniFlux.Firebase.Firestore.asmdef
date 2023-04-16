@@ -2,14 +2,17 @@
     "name": "Kingdox.UniFlux.Firebase.Firestore",
     "rootNamespace": "",
     "references": [
-        "GUID:fba6bbe761e454088b10837d45df2792",
-        "GUID:deccb46461c684b399bd2ef983966192"
+        "GUID:deccb46461c684b399bd2ef983966192",
+        "GUID:95dc671f015854d4883f19a758d2b1f8"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.Firestore.dll",
+        "Firebase.TaskExtension.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
