@@ -20,57 +20,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 using System;
-using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Firebase.Extensions;
 using Firebase.Firestore;
-using Kingdox.UniFlux;
 namespace Kingdox.UniFlux.Firebase.Firestore
 {
-    public static class Key
-    {
-        public const string K = "Firebase.Firestore.";
-        public const string Initialize = K + nameof(Initialize);
-        public const string Set = K + nameof(Set);
-        public const string Get = K + nameof(Get);
-        public const string GetAll = K + nameof(GetAll);
-        public const string GetId = K + nameof(GetId);
-        public const string Subscribe = K + nameof(Subscribe);
-    }
-    // public static class Service
-    // {
-    //     public static void Initialize() => Middleware.Invoke_Publish(Key.Initialize);
-
-    //     public static Task Set(in (string path, object value) data) => Middleware<(string path, object value)>.Invoke_Task(Key.Set, data);
-    //     public static Task Set(in (string path, IDictionary<string, object> value) data) => Middleware<(string path, IDictionary<string, object> value)>.Invoke_Task(Key.Set, data);
-    //     public static Task<object> Get(in string path) => Middleware<string, object>.Invoke_Task(Key.Get, path);
-    //     public static Task<object> Get(in (string path, object defaultValue) data) => Middleware<(string path, object defaultValue), object>.Invoke_Task(Key.Get, data);
-    //     public static Task<object> Get(in (string path, Type typeValue) data) => Middleware<(string path, Type typeValue), object>.Invoke_Task(Key.Get, data);
-    //     public static Task<DocumentSnapshot> GetSnapshot(in string path) => Middleware<string, DocumentSnapshot>.Invoke_Task(Key.Get, path);
-    //     public static Task<List<(string id, Dictionary<string, object> document)>> GetAll(in string path) => Middleware<string, List<(string id, Dictionary<string, object> document)>>.Invoke_Task(Key.GetAll, path);
-
-    //     public static string GetId(string pathCollection) => Middleware<string, string>.Invoke_Publish(Key.GetId, pathCollection);
-    //     public static void Subscribe((bool condition, string path, Action<DocumentSnapshot> callback) data) => Middleware<(bool condition, string path, Action<DocumentSnapshot> callback)>.Invoke_Publish(Key.Subscribe, data);
-    // }
     public sealed partial class FirestoreFlux : MonoFlux
     {
         private FirebaseFirestore db = default;
         private Dictionary<string, (ListenerRegistration listener, Action<DocumentSnapshot> caller)> dic_listener = new Dictionary<string, (ListenerRegistration, Action<DocumentSnapshot>)>();
-
         private void OnDestroy() 
         {
             foreach (var item_listener in dic_listener) item_listener.Value.listener.Stop();
         }
-
-        [Flux(Key.Initialize)] private void Initialize() => db = FirebaseFirestore.DefaultInstance;
-
-        [Flux(Key.GetId)] private string GetId(string path) => this.db.Collection(path).Document().Id;
-
-        [Flux(Key.Get)] private async Task<object> Get(string path)
+        [Flux(FirebaseFirestoreService.Key.Initialize)] private void Initialize() 
+        {
+            db = FirebaseFirestore.DefaultInstance;
+        }
+        [Flux(FirebaseFirestoreService.Key.GetId)] private string GetId(string path) 
+        {
+            return this.db.Collection(path).Document().Id;
+        }
+        [Flux(FirebaseFirestoreService.Key.Get)] private async Task<object> Get(string path)
         {
             try
             {
@@ -78,11 +52,11 @@ namespace Kingdox.UniFlux.Firebase.Firestore
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[MMA.Firebase.Firestore]: Error GET: '{path}' => {ex}");
+                Debug.LogWarning($"Error GET: '{path}' => {ex}");
                 return null;
             }
         }
-        [Flux(Key.Get)] private async Task<DocumentSnapshot> GetSnapshot(string path)
+        [Flux(FirebaseFirestoreService.Key.Get)] private async Task<DocumentSnapshot> GetSnapshot(string path)
         {
             try
             {
@@ -90,12 +64,11 @@ namespace Kingdox.UniFlux.Firebase.Firestore
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[MMA.Firebase.Firestore]: Error GET SNAPSHOT: '{path}' => {ex}");
+                Debug.LogWarning($"Error GET SNAPSHOT: '{path}' => {ex}");
                 return null;
             }
         }
-
-        [Flux(Key.Get)] private async Task<object> Get((string path, Type typeValue) arg)
+        [Flux(FirebaseFirestoreService.Key.Get)] private async Task<object> Get((string path, Type typeValue) arg)
         {
             // bug report: https://forum.unity.com/threads/no-ahead-of-time-aot-code-was-generated.1070144/
             // ~`This will be corrected in 2020.3.7.`~
@@ -118,13 +91,11 @@ namespace Kingdox.UniFlux.Firebase.Firestore
             }
         }
 
-        [Flux(Key.Get)] private async Task<object> Get((string path, object defaultValue) data) => (await Get(data.path)) ?? data.defaultValue;
-        [Flux(Key.GetAll)] private async Task<List<(string id, Dictionary<string, object> document)>> GetAll(string path) => (await this.db.Collection(path).GetSnapshotAsync()).ToList().ConvertAll(_item => (_item.Id, _item.ToDictionary()));
-        [Flux(Key.Set)] private async Task Set((string path, IDictionary<string, object> value) data) => await db.Document(data.path).SetAsync(data.value);
-        [Flux(Key.Set)] private async Task Set((string path, object value) data) => await db.Document(data.path).SetAsync(data.value);
-        
-
-        [Flux(Key.Subscribe)] private void Subscribe((bool condition, string path, Action<DocumentSnapshot> callback) data)
+        [Flux(FirebaseFirestoreService.Key.Get)] private async Task<object> Get((string path, object defaultValue) data) => (await Get(data.path)) ?? data.defaultValue;
+        [Flux(FirebaseFirestoreService.Key.GetAll)] private async Task<List<(string id, Dictionary<string, object> document)>> GetAll(string path) => (await this.db.Collection(path).GetSnapshotAsync()).ToList().ConvertAll(_item => (_item.Id, _item.ToDictionary()));
+        [Flux(FirebaseFirestoreService.Key.Set)] private async Task Set((string path, IDictionary<string, object> value) data) => await db.Document(data.path).SetAsync(data.value);
+        [Flux(FirebaseFirestoreService.Key.Set)] private async Task Set((string path, object value) data) => await db.Document(data.path).SetAsync(data.value);
+        [Flux(FirebaseFirestoreService.Key.Subscribe)] private void Subscribe((bool condition, string path, Action<DocumentSnapshot> callback) data)
         {
             if (data.condition)
             {
@@ -153,7 +124,6 @@ namespace Kingdox.UniFlux.Firebase.Firestore
                 }
             }
         }
-
         private void __OnListenerResponse(DocumentSnapshot snapshot)
         {
             if(dic_listener.ContainsKey(snapshot.Reference.Path))
@@ -166,110 +136,10 @@ namespace Kingdox.UniFlux.Firebase.Firestore
                 StartCoroutine(__Request_Response(snapshot));
             }
         }
-
         private IEnumerator __Request_Response(DocumentSnapshot snapshot)
         {
-            Debug.Log($"Snapshot Wait '{snapshot.Reference.Path}' ");
             yield return new WaitUntil(()=>dic_listener.ContainsKey(snapshot.Reference.Path));
-            Debug.Log($"Snapshot Invoke '{snapshot.Reference.Path}' ");
             dic_listener[snapshot.Reference.Path].caller?.Invoke(snapshot);
         }
-        
-        // private async Task Set((string path, ITuple value) data)
-        // {
-        //     Dictionary<string, object> dic_value = new Dictionary<string, object>();
-        //     for (int i = 0; i < data.value.Length; i++) dic_value.Add(i.ToString(), data.value[i]);
-        //     await Set((data.path, dic_value));
-        // }
-
-
-
-        //public ListenerRegistration Sync(Action<T> callback, string _id = default)
-        //{
-        //    string _idToUse = _id ?? id ?? default; // si no encuentra ningún ID entonces toca añadir
-        //    return DocRef(_idToUse).Listen(snap => {
-        //        if (snap.Exists)
-        //        {
-        //            T data = snap.ConvertTo<T>();
-        //            data.id = _idToUse;
-        //            callback?.Invoke(data);
-        //        }
-        //    });
-        //}
-
-
-        //protected static ListenerRegistration SyncCollection(string colRef, Action<T[]> callback)
-        //{
-        //    return db.Collection(PrefixDevelop + colRef).Listen(snap => {
-        //        T[] data = _ConvertCollection(snap);
-        //        callback.Invoke(data);
-        //    });
-        //}
-
     }
 }
-
-/* de BD
- * 
- * 
- * /// <summary>
-    /// Sync the information
-    /// </summary>
-    public ListenerRegistration Sync(Action<T> callback, string _id = default)
-    {
-        string _idToUse = _id ?? id ?? default; // si no encuentra ningún ID entonces toca añadir
-        return DocRef(_idToUse).Listen(snap =>{
-            if (snap.Exists)
-            {
-                T data = snap.ConvertTo<T>();
-                data.id = _idToUse;
-                callback?.Invoke(data);
-            }
-        });
-    }
-
-    /// <summary>
-    /// Returns an array of Docs
-    /// </summary>
-    /// <param name="callBack"></param>
-    public void GetAll(Action<T[]> callBack)
-    {
-        ColRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-        {
-            Assert.IsNull(task.Exception);
-            T[] data = _ConvertCollection(task.Result);
-            callBack.Invoke(data);
-        });
-    }
-
-
-
-    /// <summary>
-    /// Apply the transformation of the collection
-    /// </summary>
-    private static T[] _ConvertCollection(QuerySnapshot snap)
-    {
-        DocumentSnapshot[] Ddata = snap.ToArray();
-        T[] data = new T[Ddata.Length];
-        for (int i = 0; i < data.Length; i++){
-            data[i] = Ddata[i].ConvertTo<T>();
-            data[i].id = Ddata[i].Id;
-        }
-        return data;
-    }
-
-
- */
-
-
-//private static T[] _ConvertCollection(QuerySnapshot snap)
-//{
-//    DocumentSnapshot[] Ddata = snap.ToArray();
-//    T[] data = new T[Ddata.Length];
-//    for (int i = 0; i < data.Length; i++)
-//    {
-//        data[i] = Ddata[i].ConvertTo<T>();
-//        data[i].id = Ddata[i].Id;
-//    }
-//    return data;
-//}
