@@ -1,7 +1,7 @@
 {
-    "name": "com.kingdox.uniflux.firebase.firestore",
+    "name": "com.xavierarpa.uniflux.firebase.firestore",
     "displayName": "UniFlux.Firebase.Firestore",
-    "author": { "name": "Xavier Thomas Peter Arpa López ('Kingdox')", "url": "https://github.com/kingdox" },
+    "author": { "name": "Xavier Arpa", "url": "https://github.com/xavierarpa" },
     "version": "1.0.0",
     "unity": "2020.1",
     "description": "Firebase Firestore with UniFlux.",
